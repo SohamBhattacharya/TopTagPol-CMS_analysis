@@ -237,7 +237,7 @@ for pdgid, pdgidName in zip(l_pdgid, l_pdgidName) :
         --zTitle "Fraction of jet energy" \
         --title "#splitline{{t^{{had}} jet (AK15) image ({pdgidName} component)}}{{#splitline{{Z'#rightarrowt#bar{{t}}, m_{{Z'}} = 1 TeV}}{{p_{{T, jet}} #geq 200 GeV, |#eta_{{jet}}| < 2.4}}}}" \
         --titlePos 2 68 \
-        --outFileName "{outDir}/jetImage_hadTop_energyFrac_constiPdgid{pdgid}_ZprimeToTT_M1000_W10.pdf" \
+        --outFileName "{outDir}/jetImage_hadTop_energyFrac_constiPdgid{pdgid}_LBGS_ZprimeToTT_M1000_W10.pdf" \
     """.format(
         jetName = jetName,
         pdgid = pdgid,
@@ -280,7 +280,7 @@ for pdgid, pdgidName in zip(l_pdgid, l_pdgidName) :
         --zTitle "Fraction of jet energy" \
         --title "#splitline{{QCD jet (AK15) image ({pdgidName} component)}}{{p_{{T, jet}} #geq 200 GeV, |#eta_{{jet}}| < 2.4}}" \
         --titlePos 2 68 \
-        --outFileName "{outDir}/jetImage_qcd_energyFrac_constiPdgid{pdgid}_QCD_Pt_470to600.pdf" \
+        --outFileName "{outDir}/jetImage_qcd_energyFrac_constiPdgid{pdgid}_LBGS_QCD_Pt_470to600.pdf" \
     """.format(
         jetName = jetName,
         pdgid = pdgid,
@@ -325,7 +325,7 @@ for pdgid, pdgidName in zip(l_pdgid, l_pdgidName) :
         --zTitle "Transformed |d_{{xy}}({pdgidName}, SV)|" \
         --title "#splitline{{t^{{lep}} jet (AK15) image ({pdgidName} component)}}{{#splitline{{Z'#rightarrowt#bar{{t}}, m_{{Z'}} = 1 TeV}}{{p_{{T, jet}} #geq 200 GeV, |#eta_{{jet}}| < 2.4}}}}" \
         --titlePos 2 68 \
-        --outFileName "{outDir}/jetImage_lepTop_dxyWrtSV_constiPdgid{pdgid}_ZprimeToTT_M1000_W10.pdf" \
+        --outFileName "{outDir}/jetImage_lepTop_dxyWrtSV_constiPdgid{pdgid}_LBGS_ZprimeToTT_M1000_W10.pdf" \
     """.format(
         jetName = jetName,
         pdgid = pdgid,
@@ -369,7 +369,7 @@ for pdgid, pdgidName in zip(l_pdgid, l_pdgidName) :
         --zTitle "Transformed |d_{{xy}}({pdgidName}, SV)|" \
         --title "#splitline{{t^{{had}} jet (AK15) image ({pdgidName} component)}}{{#splitline{{Z'#rightarrowt#bar{{t}}, m_{{Z'}} = 1 TeV}}{{p_{{T, jet}} #geq 200 GeV, |#eta_{{jet}}| < 2.4}}}}" \
         --titlePos 2 68 \
-        --outFileName "{outDir}/jetImage_hadTop_dxyWrtSV_constiPdgid{pdgid}_ZprimeToTT_M1000_W10.pdf" \
+        --outFileName "{outDir}/jetImage_hadTop_dxyWrtSV_constiPdgid{pdgid}_LBGS_ZprimeToTT_M1000_W10.pdf" \
     """.format(
         jetName = jetName,
         pdgid = pdgid,
@@ -413,7 +413,7 @@ for pdgid, pdgidName in zip(l_pdgid, l_pdgidName) :
         --zTitle "Transformed |d_{{xy}}({pdgidName}, SV)|" \
         --title "#splitline{{QCD jet (AK15) image ({pdgidName} component)}}{{p_{{T, jet}} #geq 200 GeV, |#eta_{{jet}}| < 2.4}}" \
         --titlePos 2 68 \
-        --outFileName "{outDir}/jetImage_qcd_dxyWrtSV_constiPdgid{pdgid}_QCD_Pt_470to600.pdf" \
+        --outFileName "{outDir}/jetImage_qcd_dxyWrtSV_constiPdgid{pdgid}_LBGS_QCD_Pt_470to600.pdf" \
     """.format(
         jetName = jetName,
         pdgid = pdgid,
