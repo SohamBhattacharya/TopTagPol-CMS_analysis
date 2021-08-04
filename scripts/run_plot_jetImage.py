@@ -46,9 +46,9 @@ outDir = "plots/jetImages"
 for pdgid, pdgidName in zip(l_pdgid, l_pdgidName) :
     
     command = """
-        python -u plot_jetImage.py \
+        python -u python/plot_jetImage.py \
         --fileAndTreeNames \
-            "/nfs/dust/cms/user/sobhatta/work/TopTagPol/TreeMaker/CMSSW_10_5_0/src/ntupleTree_ZprimeToTT_M1000_W10.root:treeMaker/tree" \
+            "sourceFiles/ZprimeToTT_M1000_W10_TuneCP2_PSweights_13TeV-madgraphMLM-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_2021-07-22_15-56-01.txt:treeMaker/tree" \
         --cut \
             "({jetName}_pT_reco > 200) & (fabs({jetName}_eta_reco) < 2.4) & ({jetName}_nConsti_reco >= 3) & ({jetName}_nearestGenTopDR_reco < 1) & ({jetName}_nearestGenTopIsLeptonic_reco > 0.5)" \
         --constiCut \
@@ -56,7 +56,7 @@ for pdgid, pdgidName in zip(l_pdgid, l_pdgidName) :
         --nJetMax 1000 \
         --xVar "({jetName}_consti_LBGS_x_reco - {xMin}) / {xBinWidth}" \
         --yVar "({jetName}_consti_LBGS_y_reco - {yMin}) / {yBinWidth}" \
-        --wVar "{jetName}_constiTrans_enFrac_reco" \
+        --wVar "{jetName}_consti_enFrac_reco" \
         --resolverOperation "{{new}}+{{old}}" \
         --xRange 0 50 \
         --yRange 0 70 \
@@ -88,7 +88,7 @@ for pdgid, pdgidName in zip(l_pdgid, l_pdgidName) :
     
     
     #command = """
-    #    python -u plot_jetImage.py \
+    #    python -u python/plot_jetImage.py \
     #    --fileAndTreeNames \
     #        "/nfs/dust/cms/user/sobhatta/work/TopTagPol/TreeMaker/CMSSW_10_5_0/src/ntupleTree_ZprimeToTT_M3000_W30.root:treeMaker/tree" \
     #    --cut \
@@ -98,7 +98,7 @@ for pdgid, pdgidName in zip(l_pdgid, l_pdgidName) :
     #    --nJetMax 1000 \
     #    --xVar "({jetName}_consti_LBGS_x_reco - {xMin}) / {xBinWidth}" \
     #    --yVar "({jetName}_consti_LBGS_y_reco - {yMin}) / {yBinWidth}" \
-    #    --wVar "{jetName}_constiTrans_enFrac_reco" \
+    #    --wVar "{jetName}_consti_enFrac_reco" \
     #    --resolverOperation "{{new}}+{{old}}" \
     #    --xRange 0 50 \
     #    --yRange 0 70 \
@@ -130,9 +130,9 @@ for pdgid, pdgidName in zip(l_pdgid, l_pdgidName) :
     
     
     #command = """
-    #    python -u plot_jetImage.py \
+    #    python -u python/plot_jetImage.py \
     #    --fileAndTreeNames \
-    #        "/nfs/dust/cms/user/sobhatta/work/TopTagPol/TreeMaker/CMSSW_10_5_0/src/ntupleTree_ZprimeToTT_M1000_W10.root:treeMaker/tree" \
+    #        "sourceFiles/ZprimeToTT_M1000_W10_TuneCP2_PSweights_13TeV-madgraphMLM-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_2021-07-22_15-56-01.txt:treeMaker/tree" \
     #    --cut \
     #        "({jetName}_pT_reco > 200) & (fabs({jetName}_eta_reco) < 2.4) & ({jetName}_nConsti_reco >= 3) & ({jetName}_nearestGenTopDR_reco < 1) & ({jetName}_nearestGenTopIsLeptonic_reco > 0.5)" \
     #    --constiCut \
@@ -140,7 +140,7 @@ for pdgid, pdgidName in zip(l_pdgid, l_pdgidName) :
     #    --nJetMax 1000 \
     #    --xVar "({jetName}_consti_PtEtaRot_dEta_reco - {xMin}) / {xBinWidth}" \
     #    --yVar "({jetName}_consti_PtEtaRot_dPhi_reco - {yMin}) / {yBinWidth}" \
-    #    --wVar "{jetName}_constiTrans_enFrac_reco" \
+    #    --wVar "{jetName}_consti_enFrac_reco" \
     #    --resolverOperation "{{new}}+{{old}}" \
     #    --xRange 0 50 \
     #    --yRange 0 70 \
@@ -172,7 +172,7 @@ for pdgid, pdgidName in zip(l_pdgid, l_pdgidName) :
     #
     #
     #command = """
-    #    python -u plot_jetImage.py \
+    #    python -u python/plot_jetImage.py \
     #    --fileAndTreeNames \
     #        "/nfs/dust/cms/user/sobhatta/work/TopTagPol/TreeMaker/CMSSW_10_5_0/src/ntupleTree_ZprimeToTT_M3000_W30.root:treeMaker/tree" \
     #    --cut \
@@ -182,7 +182,7 @@ for pdgid, pdgidName in zip(l_pdgid, l_pdgidName) :
     #    --nJetMax 1000 \
     #    --xVar "({jetName}_consti_PtEtaRot_dEta_reco - {xMin}) / {xBinWidth}" \
     #    --yVar "({jetName}_consti_PtEtaRot_dPhi_reco - {yMin}) / {yBinWidth}" \
-    #    --wVar "{jetName}_constiTrans_enFrac_reco" \
+    #    --wVar "{jetName}_consti_enFrac_reco" \
     #    --resolverOperation "{{new}}+{{old}}" \
     #    --xRange 0 50 \
     #    --yRange 0 70 \
@@ -214,17 +214,17 @@ for pdgid, pdgidName in zip(l_pdgid, l_pdgidName) :
     
     
     command = """
-        python -u plot_jetImage.py \
+        python -u python/plot_jetImage.py \
         --fileAndTreeNames \
-            "/nfs/dust/cms/user/sobhatta/work/TopTagPol/TreeMaker/CMSSW_10_5_0/src/ntupleTree_ZprimeToTT_M1000_W10_new.root:treeMaker/tree" \
+            "sourceFiles/ZprimeToTT_M1000_W10_TuneCP2_PSweights_13TeV-madgraphMLM-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_2021-07-22_15-56-01.txt:treeMaker/tree" \
         --cut \
             "({jetName}_pT_reco > 200) & (fabs({jetName}_eta_reco) < 2.4) & ({jetName}_nConsti_reco >= 3) & ({jetName}_nearestGenTopDR_reco < 1) & ({jetName}_nearestGenTopIsLeptonic_reco < 0.5)" \
         --constiCut \
             "(abs({jetName}_consti_id_reco) == {pdgid})" \
         --nJetMax 1000 \
-        --xVar "({jetName}_constiTrans_x_reco - {xMin}) / {xBinWidth}" \
-        --yVar "({jetName}_constiTrans_y_reco - {yMin}) / {yBinWidth}" \
-        --wVar "{jetName}_constiTrans_w_reco" \
+        --xVar "({jetName}_consti_LBGS_x_reco - {xMin}) / {xBinWidth}" \
+        --yVar "({jetName}_consti_LBGS_y_reco - {yMin}) / {yBinWidth}" \
+        --wVar "{jetName}_consti_enFrac_reco" \
         --resolverOperation "{{new}}+{{old}}" \
         --xRange 0 50 \
         --yRange 0 70 \
@@ -257,17 +257,17 @@ for pdgid, pdgidName in zip(l_pdgid, l_pdgidName) :
     
     
     command = """
-        python -u plot_jetImage.py \
+        python -u python/plot_jetImage.py \
         --fileAndTreeNames \
-            "/nfs/dust/cms/user/sobhatta/work/TopTagPol/TreeMaker/CMSSW_10_5_0/src/ntupleTree_QCD_Pt_470to600_PREMIX_RECODEBUG_new.root:treeMaker/tree" \
+            "sourceFiles/QCD_Pt_470to600_TuneCP5_13TeV_pythia8_RunIIAutumn18MiniAOD-PREMIX_RECODEBUG_102X_upgrade2018_realistic_v15_ext1-v1_MINIAODSIM_2021-07-22_15-54-16.txt:treeMaker/tree" \
         --cut \
             "({jetName}_pT_reco > 200) & (fabs({jetName}_eta_reco) < 2.4) & ({jetName}_nConsti_reco >= 3) & ({jetName}_nearestGenTopDR_reco > 1)" \
         --constiCut \
             "abs({jetName}_consti_id_reco) == {pdgid}" \
         --nJetMax 1000 \
-        --xVar "({jetName}_constiTrans_x_reco - {xMin}) / {xBinWidth}" \
-        --yVar "({jetName}_constiTrans_y_reco - {yMin}) / {yBinWidth}" \
-        --wVar "{jetName}_constiTrans_w_reco" \
+        --xVar "({jetName}_consti_LBGS_x_reco - {xMin}) / {xBinWidth}" \
+        --yVar "({jetName}_consti_LBGS_y_reco - {yMin}) / {yBinWidth}" \
+        --wVar "{jetName}_consti_enFrac_reco" \
         --resolverOperation "{{new}}+{{old}}" \
         --xRange 0 50 \
         --yRange 0 70 \
@@ -300,16 +300,16 @@ for pdgid, pdgidName in zip(l_pdgid, l_pdgidName) :
     
     
     command = """
-        python -u plot_jetImage.py \
+        python -u python/plot_jetImage.py \
         --fileAndTreeNames \
-            "/nfs/dust/cms/user/sobhatta/work/TopTagPol/TreeMaker/CMSSW_10_5_0/src/ntupleTree_ZprimeToTT_M1000_W10_new.root:treeMaker/tree" \
+            "sourceFiles/ZprimeToTT_M1000_W10_TuneCP2_PSweights_13TeV-madgraphMLM-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_2021-07-22_15-56-01.txt:treeMaker/tree" \
         --cut \
             "({jetName}_pT_reco > 200) & (fabs({jetName}_eta_reco) < 2.4) & ({jetName}_nConsti_reco >= 3) & ({jetName}_nearestGenTopDR_reco < 1) & ({jetName}_nearestGenTopIsLeptonic_reco > 0.5)" \
         --constiCut \
             "(abs({jetName}_consti_id_reco) == {pdgid}) * ({jetName}_consti_pT_reco > 20)" \
         --nJetMax 1000 \
-        --xVar "({jetName}_constiTrans_x_reco - {xMin}) / {xBinWidth}" \
-        --yVar "({jetName}_constiTrans_y_reco - {yMin}) / {yBinWidth}" \
+        --xVar "({jetName}_consti_LBGS_x_reco - {xMin}) / {xBinWidth}" \
+        --yVar "({jetName}_consti_LBGS_y_reco - {yMin}) / {yBinWidth}" \
         --wVar "where({jetName}_consti_svdxy_reco < 0, 0, 1-min({jetName}_consti_svdxy_reco, 3)/3.0)" \
         --resolverOperation "{{new}} if ({{newResolver}} > {{oldResolver}}) else {{old}}" \
         --resolverUpdate "max({{newResolver}}, {{oldResolver}})" \
@@ -344,16 +344,16 @@ for pdgid, pdgidName in zip(l_pdgid, l_pdgidName) :
     
     
     command = """
-        python -u plot_jetImage.py \
+        python -u python/plot_jetImage.py \
         --fileAndTreeNames \
-            "/nfs/dust/cms/user/sobhatta/work/TopTagPol/TreeMaker/CMSSW_10_5_0/src/ntupleTree_ZprimeToTT_M1000_W10_new.root:treeMaker/tree" \
+            "sourceFiles/ZprimeToTT_M1000_W10_TuneCP2_PSweights_13TeV-madgraphMLM-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_2021-07-22_15-56-01.txt:treeMaker/tree" \
         --cut \
             "({jetName}_pT_reco > 200) & (fabs({jetName}_eta_reco) < 2.4) & ({jetName}_nConsti_reco >= 3) & ({jetName}_nearestGenTopDR_reco < 1) & ({jetName}_nearestGenTopIsLeptonic_reco < 0.5)" \
         --constiCut \
             "(abs({jetName}_consti_id_reco) == {pdgid}) * ({jetName}_consti_pT_reco > 20)" \
         --nJetMax 1000 \
-        --xVar "({jetName}_constiTrans_x_reco - {xMin}) / {xBinWidth}" \
-        --yVar "({jetName}_constiTrans_y_reco - {yMin}) / {yBinWidth}" \
+        --xVar "({jetName}_consti_LBGS_x_reco - {xMin}) / {xBinWidth}" \
+        --yVar "({jetName}_consti_LBGS_y_reco - {yMin}) / {yBinWidth}" \
         --wVar "where({jetName}_consti_svdxy_reco < 0, 0, 1-min({jetName}_consti_svdxy_reco, 3)/3.0)" \
         --resolverOperation "{{new}} if ({{newResolver}} > {{oldResolver}}) else {{old}}" \
         --resolverUpdate "max({{newResolver}}, {{oldResolver}})" \
@@ -388,16 +388,16 @@ for pdgid, pdgidName in zip(l_pdgid, l_pdgidName) :
     
     
     command = """
-        python -u plot_jetImage.py \
+        python -u python/plot_jetImage.py \
         --fileAndTreeNames \
-            "/nfs/dust/cms/user/sobhatta/work/TopTagPol/TreeMaker/CMSSW_10_5_0/src/ntupleTree_QCD_Pt_470to600_PREMIX_RECODEBUG_new.root:treeMaker/tree" \
+            "sourceFiles/QCD_Pt_470to600_TuneCP5_13TeV_pythia8_RunIIAutumn18MiniAOD-PREMIX_RECODEBUG_102X_upgrade2018_realistic_v15_ext1-v1_MINIAODSIM_2021-07-22_15-54-16.txt:treeMaker/tree" \
         --cut \
             "({jetName}_pT_reco > 200) & (fabs({jetName}_eta_reco) < 2.4) & ({jetName}_nConsti_reco >= 3) & ({jetName}_nearestGenTopDR_reco > 1)" \
         --constiCut \
             "abs({jetName}_consti_id_reco) == {pdgid} * ({jetName}_consti_pT_reco > 20)" \
         --nJetMax 1000 \
-        --xVar "({jetName}_constiTrans_x_reco - {xMin}) / {xBinWidth}" \
-        --yVar "({jetName}_constiTrans_y_reco - {yMin}) / {yBinWidth}" \
+        --xVar "({jetName}_consti_LBGS_x_reco - {xMin}) / {xBinWidth}" \
+        --yVar "({jetName}_consti_LBGS_y_reco - {yMin}) / {yBinWidth}" \
         --wVar "where({jetName}_consti_svdxy_reco < 0, 0, 1-min({jetName}_consti_svdxy_reco, 3)/3.0)" \
         --resolverOperation "{{new}} if ({{newResolver}} > {{oldResolver}}) else {{old}}" \
         --resolverUpdate "max({{newResolver}}, {{oldResolver}})" \
