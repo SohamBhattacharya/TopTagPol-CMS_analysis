@@ -17,7 +17,7 @@ ROOT.gROOT.SetBatch(1)
 import CMS_lumi
 #import tdrstyle
 
-import Common
+import utils
 
 
 def main() :
@@ -57,6 +57,14 @@ def main() :
         nargs = "*",
         required = False,
         default = None,
+    )
+    
+    parser.add_argument(
+        "--nJetMax",
+        help = "Maximum number of jets to plot",
+        type = int,
+        required = False,
+        default = 100000,
     )
     
     parser.add_argument(
@@ -176,6 +184,15 @@ def main() :
     )
     
     parser.add_argument(
+        "--legendPos",
+        help = "Legend position",
+        type = str,
+        required = False,
+        choices = ["UL", "UR", "LR", "LL"],
+        default = "UR",
+    )
+    
+    parser.add_argument(
         "--outFileName",
         help = "Output file name",
         type = str,
@@ -201,6 +218,8 @@ def main() :
     
     for iVar, varName in enumerate(args.plotVars) :
         
+        print(args.fileAndTreeNames[iVar])
+        
         histName = "h1_var%d" %(iVar+1)
         h1_var = ROOT.TH1F(histName, histName, int(args.plotBin[0]), args.plotBin[1], args.plotBin[2])
         
@@ -214,24 +233,35 @@ def main() :
             
             d_branchName_alias[weightVarName] = args.wVars[iVar]
         
+        fileAndTreeNames = utils.get_fileAndTreeNames([args.fileAndTreeNames[iVar]])
+        
         l_branchName = list(d_branchName_alias.keys())
         
+        nJet = 0
+        
         for tree_branches in uproot.iterate(
-            files = args.fileAndTreeNames[iVar],
+            files = fileAndTreeNames,
             expressions = l_branchName,
             aliases = d_branchName_alias,
             cut = args.cuts[iVar],
-            language = Common.uproot_lang,
-            step_size = 100000,
+            language = utils.uproot_lang,
+            step_size = 10000,
+            num_workers = 10,
         ) :
             
-            print(args.fileAndTreeNames[iVar])
+            #print(fileAndTreeNames)
             
             a_plotVar = awkward.flatten(tree_branches[plotVarName], axis = None).to_numpy()
             
             a_wVar = awkward.flatten(tree_branches[weightVarName], axis = None).to_numpy() if (args.wVars is not None) else numpy.ones(len(a_plotVar))
             
             h1_var.FillN(len(a_plotVar), a_plotVar, a_wVar)
+            
+            nJet += len(a_plotVar)
+            
+            if (nJet > args.nJetMax) :
+                
+                break
         
         
         print(h1_var.Integral(), h1_var.GetEntries())
@@ -258,8 +288,6 @@ def main() :
     legendHeightScale = 1
     legendWidthScale = 1
     
-    legendPos = "UR"
-    
     legendHeight = legendHeightScale * 0.05 * len(l_hist)
     legendWidth = legendWidthScale * 0.65
     
@@ -268,19 +296,19 @@ def main() :
     padBottom = canvas.GetBottomMargin() + 0.6*ROOT.gStyle.GetTickLength("y")
     padLeft = canvas.GetLeftMargin() + 0.6*ROOT.gStyle.GetTickLength("x")
     
-    if(legendPos == "UR") :
+    if(args.legendPos == "UR") :
         
         legend = ROOT.TLegend(padRight-legendWidth, padTop-legendHeight, padRight, padTop)
     
-    elif(legendPos == "LR") :
+    elif(args.legendPos == "LR") :
         
         legend = ROOT.TLegend(padRight-legendWidth, padBottom, padRight, padBottom+legendHeight)
     
-    elif(legendPos == "LL") :
+    elif(args.legendPos == "LL") :
         
         legend = ROOT.TLegend(padLeft, padBottom, padLeft+legendWidth, padBottom+legendHeight)
     
-    elif(legendPos == "UL") :
+    elif(args.legendPos == "UL") :
         
         legend = ROOT.TLegend(padLeft, padTop-legendHeight, padLeft+legendWidth, padTop)
     
@@ -304,6 +332,11 @@ def main() :
     stack.GetYaxis().SetTitle(args.yTitle)
     
     canvas.SetLogy(args.logY)
+    
+    if ("/" in args.outFileName) :
+        
+        outDir = args.outFileName[0: args.outFileName.rfind("/")]
+        os.system("mkdir -p %s" %(outDir))
     
     canvas.SaveAs(args.outFileName)
     

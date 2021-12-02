@@ -16,7 +16,7 @@ ROOT.gROOT.SetBatch(1)
 import CMS_lumi
 #import tdrstyle
 
-import Common
+import utils
 
 
 def main() :
@@ -229,28 +229,7 @@ def main() :
     
     l_branchName = list(d_branchName_alias.keys())
     
-    fileAndTreeNames = []
-    
-    for fName in args.fileAndTreeNames :
-        
-        if (".root" in fName) :
-            
-            fileAndTreeNames.append(fName)
-        
-        elif (".txt" in fName) :
-            
-            sourceFile, treeName = fName.strip().split(":")
-            
-            rootFileNames = numpy.loadtxt(sourceFile, dtype = str, delimiter = "*"*100)
-            
-            for rootFileName in rootFileNames :
-                
-                fileAndTreeNames.append("%s:%s" %(rootFileName, treeName))
-        
-        else :
-            
-            print("Error. Invalid syntax for fileAndTreeNames: %s" %(fName))
-            exit(1)
+    fileAndTreeNames = utils.get_fileAndTreeNames(args.fileAndTreeNames)
     
     for iFile, fileAndTreeName in enumerate(fileAndTreeNames) :
         
@@ -259,7 +238,7 @@ def main() :
             expressions = l_branchName,
             aliases = d_branchName_alias,
             cut = args.cut,
-            language = Common.uproot_lang,
+            language = utils.uproot_lang,
             step_size = 100000,
         ) :
             
@@ -393,7 +372,7 @@ def main() :
     h2_jetImg.SetMaximum(args.zRange[1])
     
     
-    Common.cpalette_nipy_spectral.set()
+    utils.cpalette_nipy_spectral.set()
     
     h2_jetImg.Draw("colz")
     
