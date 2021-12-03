@@ -126,6 +126,13 @@ def main() :
     )
     
     parser.add_argument(
+        "--logX",
+        help = "x-axis in log scale",
+        default = False,
+        action = "store_true",
+    )
+    
+    parser.add_argument(
         "--logY",
         help = "y-axis in log scale",
         default = False,
@@ -259,14 +266,21 @@ def main() :
             
             nJet += len(a_plotVar)
             
-            if (nJet > args.nJetMax) :
+            if (args.nJetMax > 0 and nJet > args.nJetMax) :
                 
                 break
         
+        print("Plot:    %s" %(args.plotVars[iVar]))
+        print("Cut:     %s" %(args.cuts[iVar]))
+        #print("Weight:  %s" %(str(...))
+        print("Integral: %f, Entries: %f" %(h1_var.Integral(), h1_var.GetEntries()))
+        print("Underflow: %f, Overflow: %f" %(h1_var.GetBinContent(0), h1_var.GetBinContent(h1_var.GetNbinsX()+1)))
         
-        print(h1_var.Integral(), h1_var.GetEntries())
-        h1_var.Scale(1.0 / h1_var.Integral())
-        #h1_var.Scale(1.0 / h1_var.GetEntries())
+        if (h1_var.Integral()) :
+            
+            h1_var.Scale(1.0 / h1_var.Integral())
+        
+        ##h1_var.Scale(1.0 / h1_var.GetEntries())
         
         h1_var.SetLineColor(args.lineColors[iVar])
         h1_var.SetLineStyle(args.lineStyles[iVar])
@@ -275,70 +289,90 @@ def main() :
         h1_var.SetMarkerColor(args.lineColors[iVar])
         h1_var.SetMarkerSize(0)
         h1_var.SetFillStyle(0)
-        
+        h1_var.SetTitle(args.labels[iVar])
         
         l_hist.append(h1_var)
     
     
-    
-    canvas = ROOT.TCanvas("canvas", "canvas", 800, 600)
-    
-    stack = ROOT.THStack("stack", "")
-    
-    legendHeightScale = 1
-    legendWidthScale = 1
-    
-    legendHeight = legendHeightScale * 0.05 * len(l_hist)
-    legendWidth = legendWidthScale * 0.65
-    
-    padTop = 1 - canvas.GetTopMargin() - 0.6*ROOT.gStyle.GetTickLength("y")
-    padRight = 1 - canvas.GetRightMargin() - 0.6*ROOT.gStyle.GetTickLength("x")
-    padBottom = canvas.GetBottomMargin() + 0.6*ROOT.gStyle.GetTickLength("y")
-    padLeft = canvas.GetLeftMargin() + 0.6*ROOT.gStyle.GetTickLength("x")
-    
-    if(args.legendPos == "UR") :
-        
-        legend = ROOT.TLegend(padRight-legendWidth, padTop-legendHeight, padRight, padTop)
-    
-    elif(args.legendPos == "LR") :
-        
-        legend = ROOT.TLegend(padRight-legendWidth, padBottom, padRight, padBottom+legendHeight)
-    
-    elif(args.legendPos == "LL") :
-        
-        legend = ROOT.TLegend(padLeft, padBottom, padLeft+legendWidth, padBottom+legendHeight)
-    
-    elif(args.legendPos == "UL") :
-        
-        legend = ROOT.TLegend(padLeft, padTop-legendHeight, padLeft+legendWidth, padTop)
+    utils.root_plot1D(
+        l_hist = l_hist,
+        xrange = args.xRange,
+        yrange = args.yRange,
+        logx = args.logX, logy = args.logY,
+        title = args.title,
+        xtitle = args.xTitle, ytitle = args.yTitle,
+        centertitlex = True, centertitley = True,
+        #centerlabelx = False, centerlabely = False,
+        gridx = True, gridy = True,
+        stackdrawopt = "nostack",
+        legendpos = "UR",
+        legendncol = 1,
+        legendtextsize = 0.04,
+        outfile = args.outFileName,
+    )
     
     
-    for iVar, varName in enumerate(args.plotVars) :
-        
-        stack.Add(l_hist[iVar], "hist")
-        
-        legend.AddEntry(l_hist[iVar], "%s (#mu=%0.2f, #sigma=%0.2f)" %(args.labels[iVar], l_hist[iVar].GetMean(), l_hist[iVar].GetStdDev()), "LP")
-    
-    
-    stack.Draw("nostack")
-    legend.Draw()
-    
-    stack.GetXaxis().SetRangeUser(*args.xRange)
-    
-    stack.SetMinimum(args.yRange[0])
-    stack.SetMaximum(args.yRange[1])
-    
-    stack.GetXaxis().SetTitle(args.xTitle)
-    stack.GetYaxis().SetTitle(args.yTitle)
-    
-    canvas.SetLogy(args.logY)
-    
-    if ("/" in args.outFileName) :
-        
-        outDir = args.outFileName[0: args.outFileName.rfind("/")]
-        os.system("mkdir -p %s" %(outDir))
-    
-    canvas.SaveAs(args.outFileName)
+    #canvas = ROOT.TCanvas("canvas", "canvas", 800, 600)
+    #
+    #stack = ROOT.THStack("stack", "")
+    #
+    #legendHeightScale = 1
+    #legendWidthScale = 1
+    #
+    #legendHeight = legendHeightScale * 0.05 * len(l_hist)
+    #legendWidth = legendWidthScale * 0.65
+    #
+    #padTop = 1 - canvas.GetTopMargin() - 0.6*ROOT.gStyle.GetTickLength("y")
+    #padRight = 1 - canvas.GetRightMargin() - 0.6*ROOT.gStyle.GetTickLength("x")
+    #padBottom = canvas.GetBottomMargin() + 0.6*ROOT.gStyle.GetTickLength("y")
+    #padLeft = canvas.GetLeftMargin() + 0.6*ROOT.gStyle.GetTickLength("x")
+    #
+    #if(args.legendPos == "UR") :
+    #    
+    #    legend = ROOT.TLegend(padRight-legendWidth, padTop-legendHeight, padRight, padTop)
+    #
+    #elif(args.legendPos == "LR") :
+    #    
+    #    legend = ROOT.TLegend(padRight-legendWidth, padBottom, padRight, padBottom+legendHeight)
+    #
+    #elif(args.legendPos == "LL") :
+    #    
+    #    legend = ROOT.TLegend(padLeft, padBottom, padLeft+legendWidth, padBottom+legendHeight)
+    #
+    #elif(args.legendPos == "UL") :
+    #    
+    #    legend = ROOT.TLegend(padLeft, padTop-legendHeight, padLeft+legendWidth, padTop)
+    #
+    #
+    #for iVar, varName in enumerate(args.plotVars) :
+    #    
+    #    stack.Add(l_hist[iVar], "hist")
+    #    
+    #    legend.AddEntry(l_hist[iVar], "%s (#mu=%0.2f, #sigma=%0.2f)" %(args.labels[iVar], l_hist[iVar].GetMean(), l_hist[iVar].GetStdDev()), "LP")
+    #
+    #
+    #legend.SetFillStyle(0)
+    #
+    #
+    #stack.Draw("nostack")
+    #legend.Draw()
+    #
+    #stack.GetXaxis().SetRangeUser(*args.xRange)
+    #
+    #stack.SetMinimum(args.yRange[0])
+    #stack.SetMaximum(args.yRange[1])
+    #
+    #stack.GetXaxis().SetTitle(args.xTitle)
+    #stack.GetYaxis().SetTitle(args.yTitle)
+    #
+    #canvas.SetLogy(args.logY)
+    #
+    #if ("/" in args.outFileName) :
+    #    
+    #    outDir = args.outFileName[0: args.outFileName.rfind("/")]
+    #    os.system("mkdir -p %s" %(outDir))
+    #
+    #canvas.SaveAs(args.outFileName)
     
     
     return 0

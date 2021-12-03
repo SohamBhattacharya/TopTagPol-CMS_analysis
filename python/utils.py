@@ -16,6 +16,9 @@ import uproot
 import yaml
 
 import ROOT
+ROOT.gROOT.SetBatch(1)
+
+import CMS_lumi
 
 
 class ColorPalette :
@@ -162,6 +165,137 @@ def root_TGraph_to_TH1(graph, setError = True) :
             hist.SetBinError(binNum, pointErrY)
     
     return hist
+
+
+def root_plot1D(
+    l_hist,
+    outfile,
+    xrange,
+    yrange,
+    logx = False, logy = False,
+    title = "",
+    xtitle = "", ytitle = "",
+    centertitlex = True, centertitley = True,
+    centerlabelx = False, centerlabely = False,
+    gridx = False, gridy = False,
+    ndivisionsx = [5, 5, 0],
+    stackdrawopt = "nostack",
+    legendpos = "UR",
+    legendncol = 1,
+    legendtextsize = 0.04,
+    legendheightscale = 1.0, legendwidthscale = 1.0,
+) :
+    
+    ROOT.gROOT.LoadMacro("utils/tdrstyle.C")
+    ROOT.gROOT.ProcessLine("setTDRStyle()")
+    
+    ROOT.gROOT.SetStyle("tdrStyle")
+    ROOT.gROOT.ForceStyle(True)
+    
+    canvas = ROOT.TCanvas("canvas", "canvas", 600, 600)
+    canvas.UseCurrentStyle()
+    
+    canvas.SetLeftMargin(0.16)
+    canvas.SetRightMargin(0.05)
+    canvas.SetTopMargin(0.1)
+    canvas.SetBottomMargin(0.135)
+    
+    
+    legendHeight = legendheightscale * 0.06 * len(l_hist)
+    legendWidth = legendwidthscale * 0.4
+    
+    padTop = 1 - canvas.GetTopMargin() - 1*ROOT.gStyle.GetTickLength("y")
+    padRight = 1 - canvas.GetRightMargin() - 0.6*ROOT.gStyle.GetTickLength("x")
+    padBottom = canvas.GetBottomMargin() + 0.6*ROOT.gStyle.GetTickLength("y")
+    padLeft = canvas.GetLeftMargin() + 0.6*ROOT.gStyle.GetTickLength("x")
+    
+    if(legendpos == "UR") :
+        
+        legend = ROOT.TLegend(padRight-legendWidth, padTop-legendHeight, padRight, padTop)
+    
+    elif(legendpos == "LR") :
+        
+        legend = ROOT.TLegend(padRight-legendWidth, padBottom, padRight, padBottom+legendHeight)
+    
+    elif(legendpos == "LL") :
+        
+        legend = ROOT.TLegend(padLeft, padBottom, padLeft+legendWidth, padBottom+legendHeight)
+    
+    elif(legendpos == "UL") :
+        
+        legend = ROOT.TLegend(padLeft, padTop-legendHeight, padLeft+legendWidth, padTop)
+    
+    else :
+        
+        print("Wrong legend position option:", legendpos)
+        exit(1)
+    
+    
+    legend.SetNColumns(legendncol)
+    legend.SetFillStyle(0)
+    legend.SetBorderSize(0)
+    legend.SetTextSize(legendtextsize)
+    
+    stack = ROOT.THStack()
+    
+    for hist in l_hist :
+        
+        hist.GetXaxis().SetRangeUser(xrange[0], xrange[1])
+        #hist.SetFillStyle(0)
+        
+        stack.Add(hist, "hist")
+        legend.AddEntry(hist, hist.GetTitle(), "LP")
+    
+    # Add a dummy histogram so that the X-axis range can be beyond the histogram range
+    h1_xRange = ROOT.TH1F("h1_xRange", "h1_xRange", 1, xrange[0], xrange[1])
+    stack.Add(h1_xRange)
+    
+    stack.Draw(stackdrawopt)
+    legend.Draw()
+    
+    stack.GetXaxis().SetRangeUser(xrange[0], xrange[1])
+    stack.SetMinimum(yrange[0])
+    stack.SetMaximum(yrange[1])
+    
+    stack.GetXaxis().SetNdivisions(ndivisionsx[0], ndivisionsx[1], ndivisionsx[2], False)
+    
+    #stack.GetXaxis().SetLabelSize(ROOT.gStyle.GetLabelSize("X") * xLabelSizeScale)
+    #stack.GetYaxis().SetLabelSize(ROOT.gStyle.GetLabelSize("Y") * yLabelSizeScale)
+    
+    stack.GetXaxis().SetTitle(xtitle)
+    #stack.GetXaxis().SetTitleSize(ROOT.gStyle.GetTitleSize("X") * xTitleSizeScale)
+    stack.GetXaxis().SetTitleOffset(ROOT.gStyle.GetTitleOffset("X") * 1.1)
+    
+    stack.GetYaxis().SetTitle(ytitle)
+    #stack.GetYaxis().SetTitleSize(ROOT.gStyle.GetTitleSize("Y") * yTitleSizeScale)
+    stack.GetYaxis().SetTitleOffset(ROOT.gStyle.GetTitleOffset("Y") * 1)
+    
+    #stack.SetTitle(title)
+
+    stack.GetXaxis().CenterTitle(centertitlex)
+    stack.GetYaxis().CenterTitle(centertitley)
+    
+    stack.GetXaxis().CenterLabels(centerlabelx)
+    stack.GetYaxis().CenterLabels(centerlabely)
+    
+    canvas.SetLogx(logx)
+    canvas.SetLogy(logy)
+    
+    canvas.SetGridx(gridx)
+    canvas.SetGridy(gridy)
+    
+    CMS_lumi.CMS_lumi(pad = canvas, iPeriod = 0, iPosX = 0, CMSextraText = "Simulation Preliminary", lumiText = "(13 TeV)")
+    
+    if ("/" in outfile) :
+        
+        outdir = outfile
+        outdir = outdir[0: outdir.rfind("/")]
+        
+        os.system("mkdir -p %s" %(outdir))
+    
+    canvas.SaveAs(outfile)
+    
+    return 0
 
 
 if (__name__ == "__main__") :
