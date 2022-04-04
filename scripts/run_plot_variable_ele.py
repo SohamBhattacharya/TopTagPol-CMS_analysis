@@ -29,7 +29,7 @@ for i in range(0, 1) :
     d_format["jetName"]         = jetName
     d_format["nJetMax"]         = nJetMax
     
-    d_format["commonCut"]       = commonCut.format(** d_format)
+    d_format["commonCut"]       = commonCut.format(**d_format)
     
     
     

@@ -3,7 +3,7 @@
 import os
 
 
-jetName = "jet_selectedPatJetsAK15PFPuppi_boost_2_1_sd_0p1_0_1"
+jetName = "jet_selectedPatJetsAK15PFPuppi_boost_2_1_sd_z0p1_b0_R1"
 nJetMax = 100000
 
 
@@ -153,54 +153,121 @@ outDir = "plots/variables/%s" %(jetName)
 
 
 
+#command = """
+#    python -u python/plot_variable.py \
+#    --fileAndTreeNames \
+#        "sourceFiles/ZprimeToTT_M1000_W10_TuneCP2_PSweights_13TeV-madgraphMLM-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_2021-07-22_15-56-01.txt:treeMaker/tree" \
+#        "sourceFiles/ZprimeToTT_M2000_W20_TuneCP2_PSweights_13TeV-madgraphMLM-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_2021-07-22_15-56-51.txt:treeMaker/tree" \
+#        "sourceFiles/ZprimeToTT_M1000_W10_TuneCP2_PSweights_13TeV-madgraphMLM-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_2021-07-22_15-56-01.txt:treeMaker/tree" \
+#        "sourceFiles/ZprimeToTT_M2000_W20_TuneCP2_PSweights_13TeV-madgraphMLM-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_2021-07-22_15-56-51.txt:treeMaker/tree" \
+#        "sourceFiles/QCD_Pt_300to470_TuneCP5_13TeV_pythia8_RunIIAutumn18MiniAOD-PREMIX_RECODEBUG_102X_upgrade2018_realistic_v15-v1_MINIAODSIM_2021-07-22_15-54-11.txt:treeMaker/tree" \
+#    --plotVars \
+#        "{jetName}_m_reco" \
+#        "{jetName}_m_reco" \
+#        "{jetName}_m_reco" \
+#        "{jetName}_m_reco" \
+#        "{jetName}_m_reco" \
+#    --cuts \
+#        "({jetName}_pT_reco > 200) & (fabs({jetName}_eta_reco) < 2.4) & ({jetName}_nConsti_reco >= 3) & ({jetName}_nearestGenTopDR_reco < 1) & ({jetName}_nearestGenTopIsLeptonic_reco > 0.5)" \
+#        "({jetName}_pT_reco > 200) & (fabs({jetName}_eta_reco) < 2.4) & ({jetName}_nConsti_reco >= 3) & ({jetName}_nearestGenTopDR_reco < 1) & ({jetName}_nearestGenTopIsLeptonic_reco > 0.5)" \
+#        "({jetName}_pT_reco > 200) & (fabs({jetName}_eta_reco) < 2.4) & ({jetName}_nConsti_reco >= 3) & ({jetName}_nearestGenTopDR_reco < 1) & ({jetName}_nearestGenTopIsLeptonic_reco < 0.5)" \
+#        "({jetName}_pT_reco > 200) & (fabs({jetName}_eta_reco) < 2.4) & ({jetName}_nConsti_reco >= 3) & ({jetName}_nearestGenTopDR_reco < 1) & ({jetName}_nearestGenTopIsLeptonic_reco < 0.5)" \
+#        "({jetName}_pT_reco > 200) & (fabs({jetName}_eta_reco) < 2.4) & ({jetName}_nConsti_reco >= 3) & ({jetName}_nearestGenTopDR_reco > 1)" \
+#    --labels \
+#        "t^{{lep}} (Z' 1 TeV)" \
+#        "t^{{lep}} (Z' 2 TeV)" \
+#        "t^{{had}} (Z' 1 TeV)" \
+#        "t^{{had}} (Z' 2 TeV)" \
+#        "QCD (p_{{T}} 300-470 GeV)" \
+#    --lineColors \
+#        2 \
+#        2 \
+#        4 \
+#        4 \
+#        6 \
+#    --lineStyles \
+#        1 \
+#        2 \
+#        1 \
+#        2 \
+#        1 \
+#    --plotBin 500 0 1000 \
+#    --xRange 0 300 \
+#    --yRange 0 0.1 \
+#    --nJetMax {nJetMax} \
+#    --xTitle "m_{{jet}}" \
+#    --yTitle "arbitrary unit" \
+#    --title "title" \
+#    --titlePos 0 0 \
+#    --legendPos UR \
+#    --outFileName "{outDir}/{jetName}_m.pdf" \
+#""".format(
+#    outDir = outDir,
+#    jetName = jetName,
+#    nJetMax = nJetMax,
+#)
+#
+#os.system(command)
+#print("\n")
+
+
+
 command = """
     python -u python/plot_variable.py \
     --fileAndTreeNames \
-        "sourceFiles/ZprimeToTT_M1000_W10_TuneCP2_PSweights_13TeV-madgraphMLM-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_2021-07-22_15-56-01.txt:treeMaker/tree" \
-        "sourceFiles/ZprimeToTT_M2000_W20_TuneCP2_PSweights_13TeV-madgraphMLM-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_2021-07-22_15-56-51.txt:treeMaker/tree" \
-        "sourceFiles/ZprimeToTT_M1000_W10_TuneCP2_PSweights_13TeV-madgraphMLM-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_2021-07-22_15-56-01.txt:treeMaker/tree" \
-        "sourceFiles/ZprimeToTT_M2000_W20_TuneCP2_PSweights_13TeV-madgraphMLM-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_2021-07-22_15-56-51.txt:treeMaker/tree" \
-        "sourceFiles/QCD_Pt_300to470_TuneCP5_13TeV_pythia8_RunIIAutumn18MiniAOD-PREMIX_RECODEBUG_102X_upgrade2018_realistic_v15-v1_MINIAODSIM_2021-07-22_15-54-11.txt:treeMaker/tree" \
+        "sourceFiles/TTJets_HT-600to800_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_2022-01-29_18-14-15.txt:treeMaker/tree" \
+        "sourceFiles/TTJets_HT-800to1200_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_2022-01-29_18-16-12.txt:treeMaker/tree" \
+        "sourceFiles/TTJets_HT-1200to2500_TuneCP5_13TeV-madgraphMLM-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_2022-01-29_18-17-32.txt:treeMaker/tree" \
+        "sourceFiles/ZprimeToTT_M2000_W20_TuneCP2_PSweights_13TeV-madgraphMLM-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_2022-01-29_18-12-26.txt:treeMaker/tree" \
+        "sourceFiles/ZprimeToTT_M3000_W30_TuneCP2_PSweights_13TeV-madgraphMLM-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_2022-01-29_18-12-34.txt:treeMaker/tree" \
+        "sourceFiles/ZprimeToTT_M4000_W40_TuneCP2_PSweights_13TeV-madgraphMLM-pythia8_RunIIAutumn18MiniAOD-102X_upgrade2018_realistic_v15-v1_MINIAODSIM_2022-01-29_18-12-52.txt:treeMaker/tree" \
     --plotVars \
-        "{jetName}_m_reco" \
-        "{jetName}_m_reco" \
-        "{jetName}_m_reco" \
-        "{jetName}_m_reco" \
-        "{jetName}_m_reco" \
+        "{jetName}_pT_reco" \
+        "{jetName}_pT_reco" \
+        "{jetName}_pT_reco" \
+        "{jetName}_pT_reco" \
+        "{jetName}_pT_reco" \
+        "{jetName}_pT_reco" \
     --cuts \
-        "({jetName}_pT_reco > 200) & (fabs({jetName}_eta_reco) < 2.4) & ({jetName}_nConsti_reco >= 3) & ({jetName}_nearestGenTopDR_reco < 1) & ({jetName}_nearestGenTopIsLeptonic_reco > 0.5)" \
-        "({jetName}_pT_reco > 200) & (fabs({jetName}_eta_reco) < 2.4) & ({jetName}_nConsti_reco >= 3) & ({jetName}_nearestGenTopDR_reco < 1) & ({jetName}_nearestGenTopIsLeptonic_reco > 0.5)" \
-        "({jetName}_pT_reco > 200) & (fabs({jetName}_eta_reco) < 2.4) & ({jetName}_nConsti_reco >= 3) & ({jetName}_nearestGenTopDR_reco < 1) & ({jetName}_nearestGenTopIsLeptonic_reco < 0.5)" \
-        "({jetName}_pT_reco > 200) & (fabs({jetName}_eta_reco) < 2.4) & ({jetName}_nConsti_reco >= 3) & ({jetName}_nearestGenTopDR_reco < 1) & ({jetName}_nearestGenTopIsLeptonic_reco < 0.5)" \
-        "({jetName}_pT_reco > 200) & (fabs({jetName}_eta_reco) < 2.4) & ({jetName}_nConsti_reco >= 3) & ({jetName}_nearestGenTopDR_reco > 1)" \
+        "({jetName}_pT_reco > 200) & (fabs({jetName}_eta_reco) < 2.5) & ({jetName}_nConsti_reco >= 3) & ({jetName}_nearestGenTopDR_reco < 1) & ({jetName}_nearestGenTopIsLeptonic_reco > 0.5)" \
+        "({jetName}_pT_reco > 200) & (fabs({jetName}_eta_reco) < 2.5) & ({jetName}_nConsti_reco >= 3) & ({jetName}_nearestGenTopDR_reco < 1) & ({jetName}_nearestGenTopIsLeptonic_reco > 0.5)" \
+        "({jetName}_pT_reco > 200) & (fabs({jetName}_eta_reco) < 2.5) & ({jetName}_nConsti_reco >= 3) & ({jetName}_nearestGenTopDR_reco < 1) & ({jetName}_nearestGenTopIsLeptonic_reco > 0.5)" \
+        "({jetName}_pT_reco > 200) & (fabs({jetName}_eta_reco) < 2.5) & ({jetName}_nConsti_reco >= 3) & ({jetName}_nearestGenTopDR_reco < 1) & ({jetName}_nearestGenTopIsLeptonic_reco > 0.5)" \
+        "({jetName}_pT_reco > 200) & (fabs({jetName}_eta_reco) < 2.5) & ({jetName}_nConsti_reco >= 3) & ({jetName}_nearestGenTopDR_reco < 1) & ({jetName}_nearestGenTopIsLeptonic_reco > 0.5)" \
+        "({jetName}_pT_reco > 200) & (fabs({jetName}_eta_reco) < 2.5) & ({jetName}_nConsti_reco >= 3) & ({jetName}_nearestGenTopDR_reco < 1) & ({jetName}_nearestGenTopIsLeptonic_reco > 0.5)" \
     --labels \
-        "t^{{lep}} (Z' 1 TeV)" \
+        "t^{{lep}} (t#bar{{t}} 600<H_{{T}}<800 GeV)" \
+        "t^{{lep}} (t#bar{{t}} 800<H_{{T}}<1200 GeV)" \
+        "t^{{lep}} (t#bar{{t}} 1200<H_{{T}}<2500 GeV)" \
         "t^{{lep}} (Z' 2 TeV)" \
-        "t^{{had}} (Z' 1 TeV)" \
-        "t^{{had}} (Z' 2 TeV)" \
-        "QCD (p_{{T}} 300-470 GeV)" \
+        "t^{{lep}} (Z' 3 TeV)" \
+        "t^{{lep}} (Z' 4 TeV)" \
     --lineColors \
         2 \
-        2 \
         4 \
+        6 \
+        2 \
         4 \
         6 \
     --lineStyles \
         1 \
-        2 \
         1 \
-        2 \
         1 \
-    --plotBin 500 0 1000 \
-    --xRange 0 300 \
-    --yRange 0 0.1 \
+        7 \
+        7 \
+        7 \
+    --plotBin 100 0 2000 \
+    --xRange 0 2000 \
+    --yRange 1e-5 1e2 \
+    --logY \
+    --nDivX 5 5 0 \
     --nJetMax {nJetMax} \
-    --xTitle "m_{{jet}}" \
+    --xTitle "p_{{T, jet}}" \
     --yTitle "arbitrary unit" \
     --title "title" \
     --titlePos 0 0 \
-    --legendPos UR \
-    --outFileName "{outDir}/{jetName}_m.pdf" \
+    --legendPos UL \
+    --outFileName "{outDir}/jet_pT.pdf" \
 """.format(
     outDir = outDir,
     jetName = jetName,
@@ -209,25 +276,3 @@ command = """
 
 os.system(command)
 print("\n")
-
-
-
-#--fileAndTreeNames
-#--cuts
-#--plotVars
-#--wVars
-#--labels
-#--lineColors
-#--lineStyles
-#--lineWidths
-#--plotBin
-#--xRange
-#--yRange
-#--logY
-#--xTitle
-#--yTitle
-#--nDivX
-#--nDivY
-#--title
-#--titlePos
-#--outFileName

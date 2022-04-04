@@ -1,5 +1,6 @@
 import argparse
 import ctypes
+import gc
 import io
 import matplotlib
 import matplotlib.colors
@@ -11,6 +12,7 @@ import psutil
 import re
 import sortedcontainers
 import sparse
+import subprocess
 import time
 import uproot
 import yaml
@@ -57,6 +59,7 @@ uproot_lang = uproot.language.python.PythonLanguage()
 uproot_lang.functions["min"] = numpy.minimum
 uproot_lang.functions["max"] = numpy.maximum
 uproot_lang.functions["where"] = numpy.where
+uproot_lang.functions["nonzero"] = numpy.nonzero
 
 
 def load_config(fileName) :
@@ -77,6 +80,8 @@ def load_config(fileName) :
         #d_loadConfig = yaml.load(fileContent, Loader = yaml.FullLoader)
         
         d_loadConfig["fileContent"] = fileContent
+        
+        d_loadConfig = sortedcontainers.SortedDict(d_loadConfig)
         
         return d_loadConfig
 
@@ -131,6 +136,43 @@ def get_fileAndTreeNames(in_list) :
     return fileAndTreeNames
 
 
+def format_file(filename, d, execute = False) :
+    
+    l_cmd = []
+    
+    for key in d :
+        
+        val = d[key]
+        
+        l_cmd.append("sed -i \"s#{find}#{repl}#g\" {filename}".format(
+            find = key,
+            repl = val,
+            filename = filename,
+        ))
+    
+    if (execute) :
+        
+        run_cmd_list(l_cmd)
+    
+    else :
+        
+        return l_cmd
+
+
+def get_name_withtimestamp(dirname) :
+    
+    if (os.path.exists(dirname)) :
+        
+        timestamp = subprocess.check_output(["date", "+%Y-%m-%d_%H-%M-%S", "-r", dirname]).strip()
+        timestamp = timestamp.decode("UTF-8") # Convert from bytes to string
+        
+        dirname_new = "%s_%s" %(dirname, str(timestamp))
+        
+        return dirname_new
+    
+    return None
+
+
 def root_TGraph_to_TH1(graph, setError = True) :
     
     hist = graph.GetHistogram().Clone()
@@ -167,6 +209,33 @@ def root_TGraph_to_TH1(graph, setError = True) :
     return hist
 
 
+def wait_for_asyncpool(l_job) :
+    
+    l_isJobDone = [False] * len(l_job)
+    
+    while(False in l_isJobDone) :
+        
+        for iJob, job in enumerate(l_job) :
+            
+            if (job is None) :
+                
+                continue
+            
+            if (not l_isJobDone[iJob] and job.ready()) :
+                
+                l_isJobDone[iJob] = True
+                
+                retVal = job.get()
+                
+                l_job[iJob] = None
+                
+                if (not sum(l_isJobDone) % 10) :
+                    
+                    gc.collect()
+    
+    gc.collect()
+
+
 def root_plot1D(
     l_hist,
     outfile,
@@ -178,7 +247,8 @@ def root_plot1D(
     centertitlex = True, centertitley = True,
     centerlabelx = False, centerlabely = False,
     gridx = False, gridy = False,
-    ndivisionsx = [5, 5, 0],
+    #ndivisionsx = [5, 5, 0],
+    ndivisionsx = None,
     stackdrawopt = "nostack",
     legendpos = "UR",
     legendncol = 1,
@@ -257,7 +327,9 @@ def root_plot1D(
     stack.SetMinimum(yrange[0])
     stack.SetMaximum(yrange[1])
     
-    stack.GetXaxis().SetNdivisions(ndivisionsx[0], ndivisionsx[1], ndivisionsx[2], False)
+    if (ndivisionsx is not None) :
+        
+        stack.GetXaxis().SetNdivisions(ndivisionsx[0], ndivisionsx[1], ndivisionsx[2], False)
     
     #stack.GetXaxis().SetLabelSize(ROOT.gStyle.GetLabelSize("X") * xLabelSizeScale)
     #stack.GetYaxis().SetLabelSize(ROOT.gStyle.GetLabelSize("Y") * yLabelSizeScale)

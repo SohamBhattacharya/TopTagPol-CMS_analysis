@@ -3,6 +3,8 @@ from __future__ import print_function
 import argparse
 import array
 import copy
+import ctypes
+import gc
 import matplotlib
 import matplotlib.pyplot
 import multiprocessing
@@ -21,7 +23,11 @@ import utils
 
 import ROOT
 ROOT.gROOT.SetBatch(1)
-ROOT.ROOT.EnableImplicitMT(20)
+
+nThread = 5
+
+ROOT.ROOT.EnableImplicitMT(nThread)
+#ROOT.ROOT.EnableImplicitMT()
 
 
 pprinter = pprint.PrettyPrinter(width = 500, depth = 2)
@@ -56,12 +62,22 @@ def main() :
     
     for iCurve, d_curve in enumerate(d_config["curves"]) :
         
+        mpmanager = multiprocessing.Manager()
+        
         d_rdframe = {}
         
         d_count_num = {}
         d_count_den = {}
         
-        l_classifiercut = [0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.97, 0.99, 0.995, 0.999, 0.9999]
+        #d_rdframe = mpmanager.dict()
+        #
+        #d_count_num_mp = mpmanager.dict()
+        #d_count_den_mp = mpmanager.dict()
+        #
+        #d_count_num = mpmanager.dict()
+        #d_count_den = mpmanager.dict()
+        
+        l_classifiercut = [0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.97, 0.99, 0.995, 0.999, 0.9999, 0.99999]
         
         for type_key in ["sig", "bkg"] :
             
@@ -79,6 +95,15 @@ def main() :
             
             d_count_num[type_key] = numpy.zeros((len(l_sample_name), len(l_classifiercut)))
             d_count_den[type_key] = numpy.zeros((len(l_sample_name), len(l_classifiercut)))
+            
+            #d_count_num_mp[type_key] = mpmanager.Array("d", [0.0] * (len(l_sample_name) * len(l_classifiercut)))
+            #d_count_den_mp[type_key] = mpmanager.Array("d", [0.0] * (len(l_sample_name) * len(l_classifiercut)))
+            #
+            ##d_count_num_mp[type_key] = multiprocessing.Array(ctypes.c_double, len(l_sample_name) * len(l_classifiercut))
+            ##d_count_den_mp[type_key] = multiprocessing.Array(ctypes.c_double, len(l_sample_name) * len(l_classifiercut))
+            #
+            #d_count_num[type_key] = numpy.frombuffer(d_count_num_mp[type_key].get_obj()).reshape((len(l_sample_name), len(l_classifiercut)))
+            #d_count_den[type_key] = numpy.frombuffer(d_count_den_mp[type_key].get_obj()).reshape((len(l_sample_name), len(l_classifiercut)))
             
             for iSample, sample_entry in enumerate(l_sample_name) :
                 
@@ -110,11 +135,23 @@ def main() :
                     
                     verbosetag_friend = "[friend %d/%d]" %(iFriend+1, len(d_curve["friends"]))
                     
+                    sample_fr = sample
+                    tag_fr = d_friend["tag"] if (d_friend["tag"] is not None) else tag
+                    
+                    if ("usefriendlist" in d_friend) :
+                        
+                        for fr in d_config["friendlist"][d_friend["usefriendlist"]] :
+                            
+                            if sample in fr :
+                                
+                                sample_fr, tag_fr = fr.split(":")
+                                break
+                    
                     l_sample_friend = [
                         "{dir}/{sample}_{tag}/{entry}".format(
                             dir = d_friend["dir"],
-                            sample = sample,
-                            tag = d_friend["tag"] if (d_friend["tag"] is not None) else tag,
+                            sample = sample_fr,
+                            tag = tag_fr,
                             entry = entry,
                         ) for entry in l_sample_filename
                     ]
@@ -139,13 +176,6 @@ def main() :
                 
                 rdframe_sample = ROOT.RDataFrame(tree_sample)
                 
-                #weight_expr_sample = "({sample_weight}) * ({weight_expr}) * {norm}".format(
-                #    sample_weight = sample_weight,
-                #    weight_expr = weight_expr,
-                #    #norm = 1,
-                #    norm = 1.0/tree_sample.GetEntries(),
-                #)
-                
                 weight_expr_sample = weight_expr
                 l_sample_norm[iSample] = float(sample_weight)/tree_sample.GetEntries()
                 
@@ -155,55 +185,151 @@ def main() :
                 d_rdframe[type_key].append(rdframe_sample)
             
             
-            #l_count_sample_num = []
-            l_count_sample_den = []
+            #for iSample, rdframe in enumerate(d_rdframe[type_key]) :
+            #    
+            #    print("")
+            #    print(l_sample_name[iSample])
+            #    
+            #    weight = l_sample_norm[iSample]
+            #    
+            #    count = rdframe.Sum(final_weight_name).GetValue()
+            #    weighted_count = count * weight
+            #    
+            #    classifiercut_expr = "(%s) * (%s)" %(final_weight_name, d_curve["classifiercut"])
+            #    
+            #    d_count_den[type_key][iSample:] = weighted_count
+            #    
+            #    for iCut, cutval in enumerate(l_classifiercut) :
+            #        
+            #        classifiercut_expr_mod = classifiercut_expr.format(
+            #            classifier = classifier_name,
+            #            value = cutval,
+            #        )
+            #        
+            #        rdframe_mod = rdframe.Define("classifier_cut", classifiercut_expr_mod)
+            #        
+            #        count = rdframe_mod.Sum("classifier_cut").GetValue()
+            #        weighted_count = count * weight
+            #        
+            #        d_count_num[type_key][iSample, iCut] = weighted_count
+            #        
+            #        eff = d_count_num[type_key][iSample, iCut] / d_count_den[type_key][iSample, iCut] if (d_count_den[type_key][iSample, iCut]) else 0
+            #        
+            #        print("[%s: %s] cut %0.6f, num %0.6e, den %0.6e, eff %0.4e" %(type_key, d_curve[type_key]["sample"], cutval, d_count_num[type_key][iSample, iCut], d_count_den[type_key][iSample, iCut], eff))
             
-            for iSample, rdframe in enumerate(d_rdframe[type_key]) :
+            global eval_counts
+            
+            def eval_counts(iSample, iCut, evalDen):
                 
-                print("")
-                print(l_sample_name[iSample])
+                #print("eval_counts", iSample, iCut, evalDen)
+                
+                log_str = []
+                #log_str.append(l_sample_name[iSample])
+                
+                rdframe = d_rdframe[type_key][iSample]
                 
                 weight = l_sample_norm[iSample]
                 
-                count = rdframe.Sum(final_weight_name).GetValue()
-                weighted_count = count * weight
-                #l_count_sample_den.append(weighted_count)
-                #print(count, weighted_count)
+                weighted_count_den = None
+                
+                if (evalDen) :
+                    
+                    count = rdframe.Sum(final_weight_name).GetValue()
+                    weighted_count_den = count * weight
+                
+                #d_count_den[type_key][iSample:] = weighted_count_den
                 
                 classifiercut_expr = "(%s) * (%s)" %(final_weight_name, d_curve["classifiercut"])
-                #print(classifiercut_expr)
                 
-                d_count_den[type_key][iSample:] = weighted_count
+                cutval = l_classifiercut[iCut]
+                
+                classifiercut_expr_mod = classifiercut_expr.format(
+                    classifier = classifier_name,
+                    value = cutval,
+                    **d_curve["vardict"],
+                )
+                #print(classifiercut_expr_mod)
+                
+                rdframe_mod = rdframe.Define("classifier_cut", classifiercut_expr_mod)
+                
+                count = rdframe_mod.Sum("classifier_cut").GetValue()
+                weighted_count_num = count * weight
+                
+                #d_count_num[type_key][iSample, iCut] = weighted_count_num
+                
+                #eff = d_count_num[type_key][iSample, iCut] / d_count_den[type_key][iSample, iCut] if (d_count_den[type_key][iSample, iCut]) else 0
+                eff = weighted_count_num / weighted_count_den if (weighted_count_den) else 0
+                
+                #log_str.append("[%s: %s] cut %0.6f, num %0.6e, den %0.6e, eff %0.4e" %(type_key, d_curve[type_key]["sample"], cutval, d_count_num[type_key][iSample, iCut], d_count_den[type_key][iSample, iCut], eff))
+                log_str.append("[%s: %s] cut %0.6f, num %0.6e, den %0.6e, eff %0.4e" %(type_key, d_curve[type_key]["sample"], cutval, weighted_count_num, weighted_count_den if (weighted_count_den) else 0, eff))
+                
+                print("\n".join(log_str))
+                
+                #return 0
+                
+                return (iSample, iCut, weighted_count_num, weighted_count_den)
+            
+            
+            ncpu_use = int(multiprocessing.cpu_count() * d_config["cpufrac"] / nThread)
+            #ncpu_use = int(multiprocessing.cpu_count() * d_config["cpufrac"])
+            
+            ncpu_use = max(1, ncpu_use)
+            
+            pool = multiprocessing.Pool(processes = ncpu_use, maxtasksperchild = 1)
+            l_job = []
+            
+            for iSample, rdframe in enumerate(d_rdframe[type_key]) :
                 
                 for iCut, cutval in enumerate(l_classifiercut) :
                     
-                    classifiercut_expr_mod = classifiercut_expr.format(
-                        classifier = classifier_name,
-                        value = cutval,
-                    )
+                    print("Submiting job: iSample %d, iCut %d" %(iSample, iCut))
                     
-                    rdframe_mod = rdframe.Define("classifier_cut", classifiercut_expr_mod)
-                    
-                    count = rdframe_mod.Sum("classifier_cut").GetValue()
-                    weighted_count = count * weight
-                    #l_count_sample_num.append(weighted_count)
-                    
-                    d_count_num[type_key][iSample, iCut] = weighted_count
-                    #print(count, weighted_count)
-                    
-                    #print("eff", l_count_sample_num[-1]/l_count_sample_den[-1])
-                    
-                    eff = d_count_num[type_key][iSample, iCut] / d_count_den[type_key][iSample, iCut] if (d_count_den[type_key][iSample, iCut]) else 0
-                    
-                    print("[%s] cut %0.6f, num %0.6e, den %0.6e, eff %0.4e" %(type_key, cutval, d_count_num[type_key][iSample, iCut], d_count_den[type_key][iSample, iCut], eff))
+                    l_job.append(pool.apply_async(
+                        eval_counts,
+                        (),
+                        dict(
+                            iSample = iSample,
+                            iCut = iCut,
+                            evalDen = not iCut,
+                        ),
+                    ))
             
-            #num = sum(l_count_sample_num)
-            #den = sum(l_count_sample_den)
-            #eff = num/den if (den) else 0
-            #
-            #print("")
-            #print("Final:")
-            #print(num, den, eff)
+            pool.close()
+            
+            #utils.wait_for_asyncpool(l_job)
+            
+            l_isJobDone = [False] * len(l_job)
+            
+            while(False in l_isJobDone) :
+                
+                for iJob, job in enumerate(l_job) :
+                    
+                    if (job is None) :
+                        
+                        continue
+                    
+                    if (not l_isJobDone[iJob] and job.ready()) :
+                        
+                        l_isJobDone[iJob] = True
+                        
+                        retVal = job.get()
+                        iSample, iCut, weighted_count_num, weighted_count_den = retVal
+                        
+                        d_count_num[type_key][iSample, iCut] = weighted_count_num
+                        
+                        if (weighted_count_den is not None) :
+                            
+                            d_count_den[type_key][iSample:] = weighted_count_den
+                        
+                        l_job[iJob] = None
+                        
+                        if (not sum(l_isJobDone) % 10) :
+                            
+                            gc.collect()
+            
+            gc.collect()
+            
+            pool.join()
         
         
         print("")

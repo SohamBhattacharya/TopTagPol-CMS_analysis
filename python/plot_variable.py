@@ -140,6 +140,13 @@ def main() :
     )
     
     parser.add_argument(
+        "--centerLabelX",
+        help = "Center x-axis labels",
+        default = False,
+        action = "store_true",
+    )
+    
+    parser.add_argument(
         "--xTitle",
         help = "X-axis title",
         type = str,
@@ -302,10 +309,11 @@ def main() :
         title = args.title,
         xtitle = args.xTitle, ytitle = args.yTitle,
         centertitlex = True, centertitley = True,
-        #centerlabelx = False, centerlabely = False,
+        centerlabelx = args.centerLabelX,
         gridx = True, gridy = True,
+        ndivisionsx = args.nDivX,
         stackdrawopt = "nostack",
-        legendpos = "UR",
+        legendpos = args.legendPos,
         legendncol = 1,
         legendtextsize = 0.04,
         outfile = args.outFileName,
